@@ -112,6 +112,30 @@ export default function Bandeja() {
                         Evaluar
                       </button>
                     )}
+                    {s.estado === "en_evaluacion" && (
+                      <button
+                        onClick={() => navigate(`/pre-solicitud?id=${s.id}`)}
+                        className="px-3 py-1 bg-orange-50 text-orange-600 rounded-lg text-xs font-semibold hover:bg-orange-100 transition"
+                      >
+                        Continuar registro
+                      </button>
+                    )}
+                    {s.estado === "en_comite" && (
+                      <button
+                        onClick={() => navigate(`/comite?id=${s.id}`)}
+                        className="px-3 py-1 bg-purple-50 text-purple-600 rounded-lg text-xs font-semibold hover:bg-purple-100 transition"
+                      >
+                        Ir a comité
+                      </button>
+                    )}
+                    {s.estado === "aprobado" && (
+                      <button
+                        onClick={() => navigate(`/desembolso?id=${s.id}`)}
+                        className="px-3 py-1 bg-green-50 text-green-600 rounded-lg text-xs font-semibold hover:bg-green-100 transition"
+                      >
+                        Desembolsar
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
