@@ -10,6 +10,7 @@ export default function Registro() {
   const [solicitud, setSolicitud] = useState(null);
   const [observaciones, setObservaciones] = useState("");
   const [asesor, setAsesor] = useState("");
+  const [tasaInteres, setTasaInteres] = useState(1.8);
   const [cargando, setCargando] = useState(false);
 
   useEffect(() => {
@@ -21,6 +22,7 @@ export default function Registro() {
     setSolicitud(data);
     if (data?.observaciones) setObservaciones(data.observaciones);
     if (data?.asesor) setAsesor(data.asesor);
+    if (data?.tasa_interes) setTasaInteres(data.tasa_interes);
   };
 
   const enviarComite = async () => {
@@ -29,6 +31,7 @@ export default function Registro() {
     await supabase.from("prestamos").update({
       observaciones,
       asesor,
+      tasa_interes: parseFloat(tasaInteres),
       estado: "en_comite",
     }).eq("id", id);
     setCargando(false);
@@ -37,7 +40,7 @@ export default function Registro() {
 
   const cuotaMensual = () => {
     if (!solicitud) return 0;
-    const tasa = 0.018;
+    const tasa = parseFloat(tasaInteres) / 100;
     const n = solicitud.plazo;
     const c = solicitud.monto;
     return ((c * tasa * Math.pow(1 + tasa, n)) / (Math.pow(1 + tasa, n) - 1)).toFixed(2);
@@ -65,7 +68,7 @@ export default function Registro() {
                 { label: "DNI", value: solicitud.dni },
                 { label: "Monto", value: `S/ ${Number(solicitud.monto).toLocaleString()}` },
                 { label: "Plazo", value: `${solicitud.plazo} meses` },
-                { label: "Tasa mensual", value: "1.8%" },
+                { label: "Tasa mensual", value: `${tasaInteres}%` },
                 { label: "Cuota mensual", value: `S/ ${cuotaMensual()}` },
                 { label: "Total a pagar", value: `S/ ${(cuotaMensual() * solicitud.plazo).toFixed(2)}` },
                 { label: "Ingresos", value: `S/ ${Number(solicitud.ingresos || 0).toLocaleString()}` },
@@ -95,13 +98,44 @@ export default function Registro() {
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
                 />
               </div>
+
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">
+                  Tasa de interés mensual (%)
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0.1"
+                    max="10"
+                    value={tasaInteres}
+                    onChange={(e) => setTasaInteres(e.target.value)}
+                    className="w-24 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+                  />
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="5"
+                    step="0.1"
+                    value={tasaInteres}
+                    onChange={(e) => setTasaInteres(e.target.value)}
+                    className="flex-1 accent-red-600"
+                  />
+                  <span className="text-sm font-bold text-gray-700 w-12 text-right">{tasaInteres}%</span>
+                </div>
+                <p className="text-xs text-gray-400 mt-1">
+                  Tasa referencial sugerida: 1.8% mensual. Ajustable según política comercial.
+                </p>
+              </div>
+
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">Observaciones</label>
                 <textarea
                   value={observaciones}
                   onChange={(e) => setObservaciones(e.target.value)}
                   placeholder="Ingresa observaciones relevantes del crédito..."
-                  rows={5}
+                  rows={4}
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 resize-none"
                 />
               </div>

@@ -12,7 +12,6 @@ export default function Comite() {
   const [observaciones, setObservaciones] = useState("");
   const [cargando, setCargando] = useState(false);
 
-  // Leer rol del usuario logueado
   const adminRol = localStorage.getItem("admin_rol") || "";
   const adminNombre = localStorage.getItem("admin_nombre") || "Usuario";
 
@@ -41,7 +40,7 @@ export default function Comite() {
 
   const cuotaMensual = () => {
     if (!solicitud) return 0;
-    const tasa = 0.018;
+    const tasa = (parseFloat(solicitud.tasa_interes) || 1.8) / 100;
     const n = solicitud.plazo;
     const c = solicitud.monto;
     return ((c * tasa * Math.pow(1 + tasa, n)) / (Math.pow(1 + tasa, n) - 1)).toFixed(2);
@@ -78,7 +77,6 @@ export default function Comite() {
     };
   };
 
-  // Jerarquía de roles: cada rol puede aprobar su nivel y los inferiores
   const jerarquia = {
     asesor: ["asesor"],
     administrador: ["asesor", "administrador"],
@@ -116,7 +114,6 @@ export default function Comite() {
         <p className="text-sm text-gray-400">Cargando...</p>
       ) : (
         <div className="grid grid-cols-2 gap-6">
-          {/* Expediente */}
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <h2 className="text-sm font-bold text-gray-700 mb-4">Expediente del crédito</h2>
             <div className="space-y-3 mb-4">
@@ -125,6 +122,7 @@ export default function Comite() {
                 { label: "DNI", value: solicitud.dni },
                 { label: "Monto", value: `S/ ${Number(solicitud.monto).toLocaleString()}` },
                 { label: "Plazo", value: `${solicitud.plazo} meses` },
+                { label: "Tasa mensual", value: `${solicitud.tasa_interes || 1.8}%` },
                 { label: "Cuota mensual", value: `S/ ${cuotaMensual()}` },
                 { label: "Ingresos", value: `S/ ${Number(solicitud.ingresos || 0).toLocaleString()}` },
                 { label: "Gastos", value: `S/ ${Number(solicitud.gastos || 0).toLocaleString()}` },
@@ -165,11 +163,9 @@ export default function Comite() {
             )}
           </div>
 
-          {/* Resolución */}
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <h2 className="text-sm font-bold text-gray-700 mb-4">Resolución del comité</h2>
 
-            {/* Banner de sesión actual */}
             <div className="bg-gray-50 rounded-lg px-4 py-3 mb-4 flex items-center justify-between">
               <div>
                 <p className="text-xs text-gray-400">Usuario en sesión</p>
@@ -189,7 +185,6 @@ export default function Comite() {
             </div>
 
             <div className="space-y-4">
-              {/* Scoring */}
               <div className={`rounded-lg p-4 text-center ${
                 solicitud.scoring >= 75 ? "bg-green-50" :
                 solicitud.scoring >= 60 ? "bg-yellow-50" : "bg-red-50"
@@ -206,7 +201,6 @@ export default function Comite() {
                 </p>
               </div>
 
-              {/* Tabla de umbrales */}
               <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-xs font-semibold text-gray-500 mb-3">Tabla de umbrales por monto</p>
                 <div className="space-y-2">
@@ -226,7 +220,6 @@ export default function Comite() {
                 </div>
               </div>
 
-              {/* Bloqueo si no tiene permisos */}
               {!puedeAprobar ? (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
                   <p className="text-2xl mb-2">🔒</p>
@@ -240,7 +233,6 @@ export default function Comite() {
                 </div>
               ) : (
                 <>
-                  {/* Decisión */}
                   <div>
                     <label className="text-xs text-gray-500 mb-2 block">Decisión del comité</label>
                     <div className="grid grid-cols-2 gap-3">

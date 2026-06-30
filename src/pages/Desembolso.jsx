@@ -24,7 +24,7 @@ export default function Desembolso() {
 
   const cuotaMensual = () => {
     if (!solicitud) return 0;
-    const tasa = 0.018;
+    const tasa = (parseFloat(solicitud.tasa_interes) || 1.8) / 100;
     const n = solicitud.plazo;
     const c = solicitud.monto;
     return ((c * tasa * Math.pow(1 + tasa, n)) / (Math.pow(1 + tasa, n) - 1)).toFixed(2);
@@ -99,7 +99,7 @@ export default function Desembolso() {
                 { label: "Plazo", value: `${solicitud.plazo} meses` },
                 { label: "Cuota mensual", value: `S/ ${cuotaMensual()}` },
                 { label: "Total a pagar", value: `S/ ${(cuotaMensual() * solicitud.plazo).toFixed(2)}` },
-                { label: "Tasa mensual", value: "1.8%" },
+                { label: "Tasa mensual", value: `${solicitud.tasa_interes || 1.8}%` },
                 { label: "Asesor", value: solicitud.asesor || "-" },
                 { label: "Scoring", value: `${solicitud.scoring}/100` },
                 { label: "Garantía", value: solicitud.garantia || "Sin garantía" },
